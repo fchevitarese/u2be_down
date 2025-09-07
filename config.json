@@ -1,3 +1,6 @@
 {
-  "default_download_path": "/Users/fredchevitarese/Downloads/Musicas"
+    "default_download_path": "/home/fred/Músicas/Downloads",
+    "logging_enabled": true,
+    "auto_convert_to_mp3": true,
+    "keep_video": false
 }
