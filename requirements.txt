@@ -2,3 +2,11 @@ yt-dlp
 moviepy
 ffmpeg-python
 PyQt5
+requests
+decorator
+imageio
+imageio-ffmpeg
+numpy
+pillow
+proglog
+tqdm
