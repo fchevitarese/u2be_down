@@ -1,6 +1,6 @@
 # Makefile para U2Be Down
 
-.PHONY: help clean install-deps build-linux build-windows build-all test
+.PHONY: help clean install-deps build-linux build-windows build-all test installers deb appimage
 
 # Default target
 help:
@@ -13,6 +13,9 @@ help:
 	@echo "  build-linux  - Build for Linux"
 	@echo "  build-windows- Build for Windows (run on Windows)"
 	@echo "  build-all    - Build for current platform"
+	@echo "  installers   - Create all Linux installers"
+	@echo "  deb          - Create .deb package"
+	@echo "  appimage     - Create AppImage"
 	@echo "  test         - Run tests"
 	@echo ""
 
@@ -20,8 +23,9 @@ help:
 clean:
 	@echo "Cleaning build artifacts..."
 	@rm -rf dist/ build/ __pycache__/
-	@rm -rf installer/ u2be-down_*/ *.deb *.tar.gz
+	@rm -rf installer/ u2be-down_*/ *.deb *.tar.gz *.AppImage
 	@rm -f u2be_down.spec installer.nsi
+	@rm -rf U2Be_Down.AppDir appimagetool-*.AppImage
 	@echo "Clean completed."
 
 # Install build dependencies
@@ -35,7 +39,22 @@ install-deps:
 # Build for Linux
 build-linux:
 	@echo "Building for Linux..."
-	@./build_linux.sh
+	@python3 simple_build.py
+
+# Create .deb package
+deb: build-linux
+	@echo "Creating .deb package..."
+	@./create_deb.sh
+
+# Create AppImage
+appimage: build-linux
+	@echo "Creating AppImage..."
+	@./create_appimage.sh
+
+# Create all installers
+installers: build-linux
+	@echo "Creating all Linux installers..."
+	@./create_installers.sh
 
 # Build for Windows (to be run on Windows)
 build-windows:

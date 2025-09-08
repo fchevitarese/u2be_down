@@ -32,6 +32,19 @@ MANIFEST
 *.manifest
 *.spec
 
+# Binários e executáveis
+*.exe
+*.deb
+*.AppImage
+*.tar.gz
+
+# Diretórios de build
+AppDir/
+deb_package/
+
+# Ferramentas baixadas
+appimagetool*
+
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt

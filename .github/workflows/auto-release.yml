@@ -29,9 +29,9 @@ jobs:
             repo: context.repo.repo,
             run_id: ${{ github.event.workflow_run.id }}
           });
-          
+
           console.log('Found artifacts:', artifacts.data.artifacts.length);
-          
+
           for (const artifact of artifacts.data.artifacts) {
             console.log(`Downloading ${artifact.name}...`);
             const download = await github.rest.actions.downloadArtifact({
@@ -40,7 +40,7 @@ jobs:
               artifact_id: artifact.id,
               archive_format: 'zip'
             });
-            
+
             const fs = require('fs');
             fs.writeFileSync(`${artifact.name}.zip`, Buffer.from(download.data));
           }
@@ -52,7 +52,7 @@ jobs:
           echo "Extracting $zip..."
           unzip -q "$zip" -d "${zip%.zip}/"
         done
-        
+
         echo "=== Extracted files ==="
         find . -name "u2be_down*" -type f
         ls -la */
@@ -64,18 +64,18 @@ jobs:
         name: "Auto Release #${{ github.run_number }}"
         body: |
           🤖 **Automatic Release**
-          
+
           Build from commit: ${{ github.event.workflow_run.head_sha }}
-          
+
           ### 📥 Downloads:
           - **Linux**: Executável standalone para Linux
           - **Windows**: Executável standalone para Windows
-          
+
           ### 🚀 Como usar:
           1. Baixe o arquivo para seu sistema
           2. Linux: `chmod +x u2be_down && ./u2be_down`
           3. Windows: Execute `u2be_down.exe`
-          
+
           **⚠️ Requer FFmpeg instalado**
         files: |
           u2be_down-linux/*

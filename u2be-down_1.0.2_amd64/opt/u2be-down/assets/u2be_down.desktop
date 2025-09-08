@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=U2Be Down
+Comment=YouTube Video Downloader
+Exec=u2be_down
+Icon=/opt/u2be_down/assets/icon.png
+Terminal=false
+Type=Application
+Categories=AudioVideo;Network;
+StartupNotify=true

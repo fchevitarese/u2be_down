@@ -29,16 +29,40 @@ jobs:
         python -m pip install --upgrade pip
         pip install pyinstaller
         pip install -r requirements.txt
+        sudo apt-get update
+        sudo apt-get install -y dpkg-dev wget
 
     - name: Build Linux executable
       run: |
         pyinstaller --onefile --console --name=u2be_down --icon=assets/icon.png --add-data="assets:assets" main.py
 
-    - name: Upload Linux artifact
+    - name: Create .deb package
+      run: |
+        chmod +x create_deb.sh
+        ./create_deb.sh
+
+    - name: Create AppImage
+      run: |
+        chmod +x create_appimage.sh
+        ./create_appimage.sh
+
+    - name: Upload Linux executable
       uses: actions/upload-artifact@v4
       with:
-        name: u2be_down-linux
+        name: u2be_down-linux-executable
         path: dist/u2be_down
+
+    - name: Upload .deb package
+      uses: actions/upload-artifact@v4
+      with:
+        name: u2be_down-linux-deb
+        path: "*.deb"
+
+    - name: Upload AppImage
+      uses: actions/upload-artifact@v4
+      with:
+        name: u2be_down-linux-appimage
+        path: "*.AppImage"
 
   build-windows:
     runs-on: windows-2022
@@ -73,10 +97,22 @@ jobs:
     permissions:
       contents: write
     steps:
-    - name: Download Linux artifact
+    - name: Download Linux executable
       uses: actions/download-artifact@v4
       with:
-        name: u2be_down-linux
+        name: u2be_down-linux-executable
+        path: ./linux/
+
+    - name: Download Linux .deb
+      uses: actions/download-artifact@v4
+      with:
+        name: u2be_down-linux-deb
+        path: ./linux/
+
+    - name: Download Linux AppImage
+      uses: actions/download-artifact@v4
+      with:
+        name: u2be_down-linux-appimage
         path: ./linux/
 
     - name: Download Windows artifact
@@ -97,26 +133,57 @@ jobs:
       with:
         files: |
           linux/u2be_down
+          linux/*.deb
+          linux/*.AppImage
           windows/u2be_down.exe
         body: |
           ## 🎉 U2Be Down - Release ${{ github.ref_name }}
 
-          ### 📥 Downloads:
-          - **Linux**: `u2be_down` (executável standalone)
-          - **Windows**: `u2be_down.exe` (executável standalone)
+          ### 📥 Downloads Linux:
+          - **🐧 Executável**: `u2be_down` (standalone)
+          - **📦 Pacote .deb**: Para Debian/Ubuntu (`sudo dpkg -i u2be-down_*.deb`)
+          - **🚀 AppImage**: Universal Linux (execute diretamente)
+
+          ### 📥 Downloads Windows:
+          - **🪟 Executável**: `u2be_down.exe` (standalone)
 
           ### 🚀 Como usar:
-          1. Baixe o arquivo para seu sistema operacional
-          2. Dê permissão de execução (Linux): `chmod +x u2be_down`
-          3. Execute: `./u2be_down` ou `u2be_down.exe`
+
+          **Linux (.deb):**
+          ```bash
+          sudo dpkg -i u2be-down_*.deb
+          sudo apt-get install -f  # Se necessário
+          u2be_down
+          ```
+
+          **Linux (AppImage):**
+          ```bash
+          chmod +x U2Be_Down-*.AppImage
+          ./U2Be_Down-*.AppImage
+          ```
+
+          **Linux/Windows (Executável):**
+          ```bash
+          chmod +x u2be_down  # Linux apenas
+          ./u2be_down  # ou u2be_down.exe no Windows
+          ```
 
           ### 📋 Funcionalidades:
-          - Download de vídeos do YouTube
-          - Conversão para MP3
-          - Interface gráfica e linha de comando
-          - Suporte a playlists
+          - ✅ Download de vídeos do YouTube
+          - ✅ Conversão automática para MP3
+          - ✅ Interface gráfica moderna
+          - ✅ Player de música integrado
+          - ✅ Suporte a playlists
+          - ✅ Downloads paralelos
+          - ✅ Histórico de downloads
 
-          **Requer FFmpeg instalado no sistema**
+          ### ⚙️ Requisitos:
+          - **FFmpeg** instalado no sistema
+          - **Linux**: `sudo apt install ffmpeg`
+          - **Windows**: Baixar de https://ffmpeg.org
+
+          ### 🐛 Problemas?
+          Reporte em: https://github.com/fchevitarese/u2be_down/issues
         tag_name: ${{ github.ref_name }}
         name: "U2Be Down v${{ github.ref_name }}"
         draft: false
