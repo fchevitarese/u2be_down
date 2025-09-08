@@ -32,7 +32,7 @@ jobs:
 
     - name: Build Linux executable
       run: |
-        pyinstaller --onefile --console --name=u2be_down main.py
+        pyinstaller --onefile --console --name=u2be_down --icon=assets/icon.png --add-data="assets:assets" main.py
 
     - name: Upload Linux artifact
       uses: actions/upload-artifact@v4
@@ -58,7 +58,7 @@ jobs:
 
     - name: Build Windows executable
       run: |
-        pyinstaller --onefile --console --name=u2be_down main.py
+        pyinstaller --onefile --console --name=u2be_down --icon=assets/icon.ico --add-data="assets;assets" main.py
 
     - name: Upload Windows artifact
       uses: actions/upload-artifact@v4
@@ -100,22 +100,22 @@ jobs:
           windows/u2be_down.exe
         body: |
           ## 🎉 U2Be Down - Release ${{ github.ref_name }}
-          
+
           ### 📥 Downloads:
           - **Linux**: `u2be_down` (executável standalone)
           - **Windows**: `u2be_down.exe` (executável standalone)
-          
+
           ### 🚀 Como usar:
           1. Baixe o arquivo para seu sistema operacional
           2. Dê permissão de execução (Linux): `chmod +x u2be_down`
           3. Execute: `./u2be_down` ou `u2be_down.exe`
-          
+
           ### 📋 Funcionalidades:
           - Download de vídeos do YouTube
           - Conversão para MP3
           - Interface gráfica e linha de comando
           - Suporte a playlists
-          
+
           **Requer FFmpeg instalado no sistema**
         tag_name: ${{ github.ref_name }}
         name: "U2Be Down v${{ github.ref_name }}"

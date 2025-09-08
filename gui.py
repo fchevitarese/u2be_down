@@ -126,8 +126,16 @@ class YouTubeDownloader(QMainWindow):
             logging.disable(logging.CRITICAL)
 
     def initUI(self):
-        self.setWindowTitle("YouTube Downloader & Music Player")
-        self.setWindowIcon(QIcon("assets/settings.png"))
+        self.setWindowTitle("U2Be Down - YouTube Downloader & Music Player")
+        
+        # Tentar carregar o ícone personalizado
+        icon_path = "assets/icon.png"
+        if os.path.exists(icon_path):
+            self.setWindowIcon(QIcon(icon_path))
+        else:
+            # Fallback para o ícone padrão se não encontrar
+            self.setWindowIcon(QIcon("assets/settings.png"))
+        
         self.setGeometry(100, 100, 1400, 900)
 
         central_widget = QWidget()

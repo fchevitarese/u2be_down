@@ -47,14 +47,25 @@ def main():
     print("🔨 Criando executável...")
 
     # Comando PyInstaller básico
-    cmd = ["pyinstaller", "--onefile", "--console", "--name=u2be_down", "main.py"]
+    cmd = ["pyinstaller", "--onefile", "--console", "--name=u2be_down"]
+    
+    # Adicionar ícone se existir
+    if platform.system() == "Windows" and Path("assets/icon.ico").exists():
+        cmd.extend(["--icon=assets/icon.ico"])
+    elif Path("assets/icon.png").exists():
+        cmd.extend(["--icon=assets/icon.png"])
+    
+    cmd.append("main.py")
 
     # Adicionar dados se existirem
     if Path("config.json").exists():
         cmd.extend(["--add-data", "config.json:."])
 
     if Path("assets").exists():
-        cmd.extend(["--add-data", "assets:assets"])
+        if platform.system() == "Windows":
+            cmd.extend(["--add-data", "assets;assets"])
+        else:
+            cmd.extend(["--add-data", "assets:assets"])
 
     # Executar PyInstaller
     success, output = run_cmd(" ".join(cmd))
