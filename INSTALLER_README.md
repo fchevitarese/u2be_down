@@ -80,7 +80,7 @@ sudo pacman -S python python-pip ffmpeg
 - `u2be-down_1.0.0_amd64.deb` - Pacote Debian
 - Scripts `install.sh` e `uninstall.sh`
 
-### Windows  
+### Windows
 - `dist/u2be_down.exe` - Executável
 - `u2be_down_windows.zip` - Pacote portável
 - `installer.nsi` - Script para NSIS

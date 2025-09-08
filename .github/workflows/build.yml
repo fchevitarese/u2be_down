@@ -11,22 +11,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    
+
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.11'
-    
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install pyinstaller
         pip install -r requirements.txt
-    
+
     - name: Build Linux executable
       run: |
         pyinstaller --onefile --console --name=u2be_down main.py
-    
+
     - name: Upload Linux artifact
       uses: actions/upload-artifact@v3
       with:
@@ -37,22 +37,22 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v3
-    
+
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.11'
-    
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install pyinstaller
         pip install -r requirements.txt
-    
+
     - name: Build Windows executable
       run: |
         pyinstaller --onefile --console --name=u2be_down main.py
-    
+
     - name: Upload Windows artifact
       uses: actions/upload-artifact@v3
       with:
@@ -69,13 +69,13 @@ jobs:
       with:
         name: u2be_down-linux
         path: ./linux/
-    
+
     - name: Download Windows artifact
       uses: actions/download-artifact@v3
       with:
         name: u2be_down-windows
         path: ./windows/
-    
+
     - name: Create Release
       uses: softprops/action-gh-release@v1
       with:

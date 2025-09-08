@@ -7,7 +7,7 @@ Foram criados vários métodos para gerar instaladores para Windows e Linux:
 ### 📁 Arquivos Principais
 
 1. **`simple_build.py`** - 🚀 Build simples e rápido
-2. **`build_linux.sh`** - 🐧 Build completo para Linux  
+2. **`build_linux.sh`** - 🐧 Build completo para Linux
 3. **`build_windows.bat`** - 🪟 Build completo para Windows
 4. **`quick_build.py`** - 🤖 Build automatizado com verificações
 5. **`Makefile`** - ⚙️ Automação com make

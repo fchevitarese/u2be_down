@@ -122,12 +122,12 @@ echo     SetOutPath "$INSTDIR"
 echo     File "installer\u2be_down.exe"
 echo     File "installer\config.json"
 echo     File /nonfatal /r "installer\assets"
-echo.    
+echo.
 echo     ; Create shortcuts
 echo     CreateDirectory "$SMPROGRAMS\U2Be Down"
 echo     CreateShortcut "$SMPROGRAMS\U2Be Down\U2Be Down.lnk" "$INSTDIR\u2be_down.exe"
 echo     CreateShortcut "$DESKTOP\U2Be Down.lnk" "$INSTDIR\u2be_down.exe"
-echo.    
+echo.
 echo     ; Registry entries
 echo     WriteRegStr HKCU "Software\U2BeDown" "" $INSTDIR
 echo     WriteUninstaller "$INSTDIR\Uninstall.exe"
@@ -139,11 +139,11 @@ echo     Delete "$INSTDIR\config.json"
 echo     RMDir /r "$INSTDIR\assets"
 echo     Delete "$INSTDIR\Uninstall.exe"
 echo     RMDir "$INSTDIR"
-echo.    
+echo.
 echo     Delete "$SMPROGRAMS\U2Be Down\U2Be Down.lnk"
 echo     RMDir "$SMPROGRAMS\U2Be Down"
 echo     Delete "$DESKTOP\U2Be Down.lnk"
-echo.    
+echo.
 echo     DeleteRegKey /ifempty HKCU "Software\U2BeDown"
 echo SectionEnd
 ) > installer.nsi
