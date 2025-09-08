@@ -1,0 +1,27 @@
+name: Test Workflow
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: List files
+      run: |
+        echo "=== Repository contents ==="
+        ls -la
+        echo "=== Python files ==="
+        find . -name "*.py" -type f
+        echo "=== Build scripts ==="
+        find . -name "build_*" -type f
+        
+    - name: Test Python syntax
+      run: |
+        python3 -m py_compile main.py
+        echo "✅ Python syntax OK"
