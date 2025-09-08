@@ -10,3 +10,8 @@ numpy
 pillow
 proglog
 tqdm
+pygame
+mutagen
+librosa
+soundfile
+scipy

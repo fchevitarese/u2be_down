@@ -25,7 +25,6 @@ from PyQt5.QtWidgets import (
     QProgressBar,
     QSplitter,
     QGroupBox,
-    QTabWidget,
 )
 from config import (
     load_config,
@@ -40,7 +39,6 @@ from main import (
     parse_urls_parallel,
     download_videos_parallel,
 )
-from music_player import MusicPlayer
 
 
 class ParseThread(QThread):
@@ -126,44 +124,16 @@ class YouTubeDownloader(QMainWindow):
             logging.disable(logging.CRITICAL)
 
     def initUI(self):
-        self.setWindowTitle("YouTube Downloader & Music Player")
+        self.setWindowTitle("YouTube Downloader")
         self.setWindowIcon(QIcon("assets/settings.png"))
-        self.setGeometry(100, 100, 1400, 900)
+        self.setGeometry(100, 100, 1200, 800)
 
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
 
-        # Layout principal
-        main_layout = QVBoxLayout()
-        
-        # Widget de abas
-        self.tab_widget = QTabWidget()
-        
-        # Aba 1: Downloader
-        self.downloader_tab = self.create_downloader_tab()
-        self.tab_widget.addTab(self.downloader_tab, "📥 Downloader")
-        
-        # Aba 2: Music Player
-        self.music_player = MusicPlayer(self.config.get("default_download_path", "downloads"))
-        self.tab_widget.addTab(self.music_player, "🎵 Player")
-        
-        main_layout.addWidget(self.tab_widget)
-        central_widget.setLayout(main_layout)
-
-        # Menu
-        self.create_menu()
-
-    def create_downloader_tab(self):
-        """Cria a aba do downloader"""
-        downloader_widget = QWidget()
-
         # Layout principal com splitter
         main_layout = QVBoxLayout()
-        splitter = QSplitter(Qt.Orientation.Vertical)
-
-        # Layout principal com splitter
-        main_layout = QVBoxLayout()
-        splitter = QSplitter(Qt.Orientation.Vertical)
+        splitter = QSplitter(Qt.Vertical)
 
         # Seção superior - Controles
         controls_widget = QWidget()
@@ -310,39 +280,20 @@ class YouTubeDownloader(QMainWindow):
         splitter.setSizes([300, 700])
 
         main_layout.addWidget(splitter)
-        downloader_widget.setLayout(main_layout)
-        
-        return downloader_widget
+        central_widget.setLayout(main_layout)
+
+        # Menu
+        self.create_menu()
 
     def create_menu(self):
         """Cria a barra de menu"""
         menubar = self.menuBar()
         if menubar:
-            # Menu Configurações
             config_menu = menubar.addMenu("Configurações")
             if config_menu:
                 config_action = config_menu.addAction("Preferências")
                 if config_action:
                     config_action.triggered.connect(self.open_config)
-            
-            # Menu Player
-            player_menu = menubar.addMenu("Player")
-            if player_menu:
-                open_player_action = player_menu.addAction("Abrir Player")
-                if open_player_action:
-                    open_player_action.triggered.connect(self.open_player_tab)
-                
-                refresh_library_action = player_menu.addAction("Atualizar Biblioteca")
-                if refresh_library_action:
-                    refresh_library_action.triggered.connect(self.refresh_music_library)
-
-    def open_player_tab(self):
-        """Abre a aba do player"""
-        self.tab_widget.setCurrentIndex(1)
-    
-    def refresh_music_library(self):
-        """Atualiza a biblioteca de músicas do player"""
-        self.music_player.load_music_library()
 
     def open_config(self):
         """Abre a janela de configurações"""
@@ -653,20 +604,11 @@ class YouTubeDownloader(QMainWindow):
         for i, download in enumerate(downloads):
             # Número da linha (coluna 0)
             number_item = QTableWidgetItem(str(i + 1))
-            number_item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+            number_item.setTextAlignment(Qt.AlignCenter)
             self.downloads_table.setItem(i, 0, number_item)
 
-            # Título (coluna 1) - mostra informação de playlist se aplicável
-            title = download.get("title", "Unknown")
-            playlist_title = download.get("playlist_title", "")
-
-            if playlist_title and download.get("is_playlist", False):
-                # Mostra formato: "Nome do Vídeo [Playlist: Nome da Playlist]"
-                display_title = f"{title} [📁 {playlist_title}]"
-            else:
-                display_title = title
-
-            title_item = QTableWidgetItem(display_title)
+            # Título (coluna 1)
+            title_item = QTableWidgetItem(download.get("title", "Unknown"))
             self.downloads_table.setItem(i, 1, title_item)
 
             # Status (coluna 2)
