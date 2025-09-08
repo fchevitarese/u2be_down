@@ -1,0 +1,84 @@
+name: Auto Release
+
+on:
+  workflow_run:
+    workflows: ["Build Multi-Platform"]
+    types:
+      - completed
+    branches:
+      - main
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  auto-release:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Download artifacts
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const artifacts = await github.rest.actions.listWorkflowRunArtifacts({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            run_id: ${{ github.event.workflow_run.id }}
+          });
+          
+          console.log('Found artifacts:', artifacts.data.artifacts.length);
+          
+          for (const artifact of artifacts.data.artifacts) {
+            console.log(`Downloading ${artifact.name}...`);
+            const download = await github.rest.actions.downloadArtifact({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              artifact_id: artifact.id,
+              archive_format: 'zip'
+            });
+            
+            const fs = require('fs');
+            fs.writeFileSync(`${artifact.name}.zip`, Buffer.from(download.data));
+          }
+
+    - name: Extract artifacts
+      run: |
+        ls -la *.zip
+        for zip in *.zip; do
+          echo "Extracting $zip..."
+          unzip -q "$zip" -d "${zip%.zip}/"
+        done
+        
+        echo "=== Extracted files ==="
+        find . -name "u2be_down*" -type f
+        ls -la */
+
+    - name: Create automatic release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: "auto-${{ github.run_number }}"
+        name: "Auto Release #${{ github.run_number }}"
+        body: |
+          🤖 **Automatic Release**
+          
+          Build from commit: ${{ github.event.workflow_run.head_sha }}
+          
+          ### 📥 Downloads:
+          - **Linux**: Executável standalone para Linux
+          - **Windows**: Executável standalone para Windows
+          
+          ### 🚀 Como usar:
+          1. Baixe o arquivo para seu sistema
+          2. Linux: `chmod +x u2be_down && ./u2be_down`
+          3. Windows: Execute `u2be_down.exe`
+          
+          **⚠️ Requer FFmpeg instalado**
+        files: |
+          u2be_down-linux/*
+          u2be_down-windows/*
+        draft: false
+        prerelease: true

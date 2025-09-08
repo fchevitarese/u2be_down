@@ -11,7 +11,7 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      
+
     - name: List files
       run: |
         echo "=== Repository contents ==="
@@ -20,7 +20,7 @@ jobs:
         find . -name "*.py" -type f
         echo "=== Build scripts ==="
         find . -name "build_*" -type f
-        
+
     - name: Test Python syntax
       run: |
         python3 -m py_compile main.py
