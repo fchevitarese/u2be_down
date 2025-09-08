@@ -34,7 +34,7 @@ jobs:
 
     - name: Build Linux executable
       run: |
-        pyinstaller --onefile --console --name=u2be_down --icon=assets/icon.png --add-data="assets:assets" main.py
+        pyinstaller --onefile --windowed --name=u2be_down --icon=assets/icon.png --add-data="assets:assets" gui.py
 
     - name: Create .deb package
       run: |
@@ -82,7 +82,7 @@ jobs:
 
     - name: Build Windows executable
       run: |
-        pyinstaller --onefile --console --name=u2be_down --icon=assets/icon.ico --add-data="assets;assets" main.py
+        pyinstaller --onefile --windowed --name=u2be_down --icon=assets/icon.ico --add-data="assets;assets" gui.py
 
     - name: Upload Windows artifact
       uses: actions/upload-artifact@v4
@@ -90,8 +90,42 @@ jobs:
         name: u2be_down-windows
         path: dist/u2be_down.exe
 
+  build-macos:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller
+        pip install -r requirements.txt
+
+    - name: Build macOS executable and app
+      run: |
+        chmod +x build_macos.sh
+        ./build_macos.sh
+
+    - name: Upload macOS app
+      uses: actions/upload-artifact@v4
+      with:
+        name: u2be_down-macos-app
+        path: dist/U2Be Down.app
+
+    - name: Upload macOS DMG
+      uses: actions/upload-artifact@v4
+      with:
+        name: u2be_down-macos-dmg
+        path: dist/U2Be-Down-macOS.dmg
+      if: always()
+
   create-release:
-    needs: [build-linux, build-windows]
+    needs: [build-linux, build-windows, build-macos]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
     permissions:

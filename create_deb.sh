@@ -139,7 +139,9 @@ if [ -f "config.json" ]; then
 fi
 
 # Copiar ícone para sistema
-if [ -f "assets/icon.png" ]; then
+if [ -f "assets/icon_128.png" ]; then
+    cp "assets/icon_128.png" "$DEB_DIR/usr/share/pixmaps/u2be-down.png"
+elif [ -f "assets/icon.png" ]; then
     cp "assets/icon.png" "$DEB_DIR/usr/share/pixmaps/u2be-down.png"
 fi
 
@@ -151,7 +153,7 @@ Name=U2Be Down
 GenericName=YouTube Downloader
 Comment=Download videos and music from YouTube
 Exec=u2be_down
-Icon=u2be-down
+Icon=/usr/share/pixmaps/u2be-down.png
 Terminal=false
 Type=Application
 Categories=AudioVideo;Audio;Video;Network;

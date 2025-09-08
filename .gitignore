@@ -37,13 +37,20 @@ MANIFEST
 *.deb
 *.AppImage
 *.tar.gz
+*.zip
+*.dmg
 
 # Diretórios de build
 AppDir/
 deb_package/
+temp_icons/
 
 # Ferramentas baixadas
 appimagetool*
+
+# Arquivos específicos do macOS
+.DS_Store
+*.app/
 
 # Installer logs
 pip-log.txt

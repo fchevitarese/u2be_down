@@ -129,10 +129,22 @@ class YouTubeDownloader(QMainWindow):
         self.setWindowTitle("U2Be Down - YouTube Downloader & Music Player")
         
         # Tentar carregar o ícone personalizado
-        icon_path = "assets/icon.png"
-        if os.path.exists(icon_path):
-            self.setWindowIcon(QIcon(icon_path))
-        else:
+        icon_paths = [
+            "assets/icon.png",          # Desenvolvimento
+            "/usr/share/pixmaps/u2be-down.png",  # Sistema instalado
+            # PyInstaller
+            (os.path.join(sys._MEIPASS, "assets", "icon.png")
+             if hasattr(sys, '_MEIPASS') else None),
+        ]
+        
+        icon_loaded = False
+        for icon_path in icon_paths:
+            if icon_path and os.path.exists(icon_path):
+                self.setWindowIcon(QIcon(icon_path))
+                icon_loaded = True
+                break
+        
+        if not icon_loaded:
             # Fallback para o ícone padrão se não encontrar
             self.setWindowIcon(QIcon("assets/settings.png"))
         

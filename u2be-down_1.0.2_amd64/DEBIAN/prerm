@@ -1,7 +1,0 @@
-#!/bin/bash
-set -e
-
-# Remover link simbólico
-rm -f /usr/local/bin/u2be_down
-
-echo "🗑️  U2Be Down removido do sistema"
