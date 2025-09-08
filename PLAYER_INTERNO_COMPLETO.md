@@ -37,7 +37,7 @@ Implementei com sucesso um **player interno completo** integrado ao YouTube Down
 - As músicas baixadas aparecerão automaticamente no player
 
 ### 2. **Reproduzir Músicas**
-- Clique na aba "🎵 Player" 
+- Clique na aba "🎵 Player"
 - Duplo clique em qualquer música para reproduzir
 - Use os controles: ▶️ ⏸️ ⏹️ ⏮️ ⏭️
 - Ajuste volume com o slider 🔊
@@ -75,7 +75,7 @@ Implementei com sucesso um **player interno completo** integrado ao YouTube Down
 Se quiser expandir ainda mais:
 
 1. **Playlist personalizada**: Criar/salvar playlists
-2. **Visualizador**: Barras de frequência durante reprodução  
+2. **Visualizador**: Barras de frequência durante reprodução
 3. **Lyrics**: Integração com APIs de letras
 4. **Equalizer**: Controles de graves/agudos
 5. **Shortcuts**: Atalhos de teclado (Space=Play/Pause, etc.)
@@ -83,6 +83,6 @@ Se quiser expandir ainda mais:
 
 ---
 
-🎉 **O player interno está 100% funcional e integrado!** 
+🎉 **O player interno está 100% funcional e integrado!**
 
 Agora você tem um sistema completo: **baixa músicas do YouTube** e **reproduz diretamente no aplicativo**! 🎵
