@@ -187,10 +187,10 @@ if [ -f "${APP_NAME}-${VERSION}-x86_64.AppImage" ]; then
     echo "📱 Para integrar ao sistema:"
     echo "   Mova o arquivo para ~/Applications/"
     echo "   Ou execute uma vez para integração automática"
-    
+
     # Tornar executável
     chmod +x "${APP_NAME}-${VERSION}-x86_64.AppImage"
-    
+
     echo ""
     echo "🔍 Testando AppImage..."
     if "./${APP_NAME}-${VERSION}-x86_64.AppImage" --help >/dev/null 2>&1; then
@@ -198,7 +198,7 @@ if [ -f "${APP_NAME}-${VERSION}-x86_64.AppImage" ]; then
     else
         echo "⚠️  AppImage criado, mas pode ter problemas"
     fi
-    
+
 else
     echo "❌ Erro ao criar AppImage"
     exit 1

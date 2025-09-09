@@ -147,31 +147,31 @@ echo "✅ Aplicação .app criada: $APP_DIR"
 # Criar DMG (se possível)
 if command -v hdiutil &> /dev/null; then
     echo "💿 Criando arquivo DMG..."
-    
+
     DMG_NAME="U2Be-Down-macOS.dmg"
     TEMP_DMG="temp.dmg"
-    
+
     # Criar DMG temporário
     hdiutil create -size 200m -fs HFS+ -volname "U2Be Down" "$TEMP_DMG"
-    
+
     # Montar DMG
     hdiutil attach "$TEMP_DMG" -readwrite -mountroot /Volumes
-    
+
     # Copiar aplicação
     cp -R "$APP_DIR" "/Volumes/U2Be Down/"
-    
+
     # Criar link para Applications
     ln -s /Applications "/Volumes/U2Be Down/Applications"
-    
+
     # Desmontar
     hdiutil detach "/Volumes/U2Be Down"
-    
+
     # Converter para DMG final comprimido
     hdiutil convert "$TEMP_DMG" -format UDZO -o "dist/$DMG_NAME"
-    
+
     # Limpar
     rm "$TEMP_DMG"
-    
+
     echo "✅ DMG criado: dist/$DMG_NAME"
 fi
 

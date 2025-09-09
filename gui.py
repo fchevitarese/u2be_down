@@ -127,27 +127,30 @@ class YouTubeDownloader(QMainWindow):
 
     def initUI(self):
         self.setWindowTitle("U2Be Down - YouTube Downloader & Music Player")
-        
+
         # Tentar carregar o ícone personalizado
         icon_paths = [
-            "assets/icon.png",          # Desenvolvimento
+            "assets/icon.png",  # Desenvolvimento
             "/usr/share/pixmaps/u2be-down.png",  # Sistema instalado
             # PyInstaller
-            (os.path.join(sys._MEIPASS, "assets", "icon.png")
-             if hasattr(sys, '_MEIPASS') else None),
+            (
+                os.path.join(sys._MEIPASS, "assets", "icon.png")
+                if hasattr(sys, "_MEIPASS")
+                else None
+            ),
         ]
-        
+
         icon_loaded = False
         for icon_path in icon_paths:
             if icon_path and os.path.exists(icon_path):
                 self.setWindowIcon(QIcon(icon_path))
                 icon_loaded = True
                 break
-        
+
         if not icon_loaded:
             # Fallback para o ícone padrão se não encontrar
             self.setWindowIcon(QIcon("assets/settings.png"))
-        
+
         self.setGeometry(100, 100, 1400, 900)
 
         central_widget = QWidget()
@@ -155,18 +158,20 @@ class YouTubeDownloader(QMainWindow):
 
         # Layout principal
         main_layout = QVBoxLayout()
-        
+
         # Widget de abas
         self.tab_widget = QTabWidget()
-        
+
         # Aba 1: Downloader
         self.downloader_tab = self.create_downloader_tab()
         self.tab_widget.addTab(self.downloader_tab, "📥 Downloader")
-        
+
         # Aba 2: Music Player
-        self.music_player = MusicPlayer(self.config.get("default_download_path", "downloads"))
+        self.music_player = MusicPlayer(
+            self.config.get("default_download_path", "downloads")
+        )
         self.tab_widget.addTab(self.music_player, "🎵 Player")
-        
+
         main_layout.addWidget(self.tab_widget)
         central_widget.setLayout(main_layout)
 
@@ -331,7 +336,7 @@ class YouTubeDownloader(QMainWindow):
 
         main_layout.addWidget(splitter)
         downloader_widget.setLayout(main_layout)
-        
+
         return downloader_widget
 
     def create_menu(self):
@@ -344,14 +349,14 @@ class YouTubeDownloader(QMainWindow):
                 config_action = config_menu.addAction("Preferências")
                 if config_action:
                     config_action.triggered.connect(self.open_config)
-            
+
             # Menu Player
             player_menu = menubar.addMenu("Player")
             if player_menu:
                 open_player_action = player_menu.addAction("Abrir Player")
                 if open_player_action:
                     open_player_action.triggered.connect(self.open_player_tab)
-                
+
                 refresh_library_action = player_menu.addAction("Atualizar Biblioteca")
                 if refresh_library_action:
                     refresh_library_action.triggered.connect(self.refresh_music_library)
@@ -359,7 +364,7 @@ class YouTubeDownloader(QMainWindow):
     def open_player_tab(self):
         """Abre a aba do player"""
         self.tab_widget.setCurrentIndex(1)
-    
+
     def refresh_music_library(self):
         """Atualiza a biblioteca de músicas do player"""
         self.music_player.load_music_library()

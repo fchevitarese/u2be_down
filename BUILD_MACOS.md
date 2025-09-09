@@ -116,7 +116,7 @@ dist/
 Se aparecer "não é possível abrir porque é de um desenvolvedor não identificado":
 
 1. **Método 1**: Botão direito → Abrir → Abrir
-2. **Método 2**: 
+2. **Método 2**:
    ```bash
    sudo xattr -rd com.apple.quarantine "/Applications/U2Be Down.app"
    ```

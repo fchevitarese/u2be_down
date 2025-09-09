@@ -9,7 +9,7 @@
 ## ✨ Features
 
 - 📹 **Download YouTube videos** in various formats
-- 🎵 **Convert to MP3** automatically  
+- 🎵 **Convert to MP3** automatically
 - 🎶 **Built-in music player** with playlist support
 - ⚡ **Parallel downloads** for faster processing
 - 📊 **Progress tracking** and download history
@@ -207,7 +207,7 @@ chmod +x generate_icons.sh
 
 # This creates:
 # - assets/icon.ico (Windows)
-# - assets/icon.icns (macOS)  
+# - assets/icon.icns (macOS)
 # - assets/icon_128.png (Linux)
 ```
 
@@ -256,7 +256,7 @@ make clean
 ```
 u2be_down/
 ├── gui.py              # Main GUI application
-├── main.py             # CLI interface  
+├── main.py             # CLI interface
 ├── config.py           # Configuration management
 ├── music_player.py     # Built-in music player
 ├── audio_processor.py  # Audio processing utilities

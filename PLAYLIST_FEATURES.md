@@ -72,7 +72,7 @@ downloads/
 
 Para cada vídeo de playlist, são preservados:
 - ✅ **Título da playlist**
-- ✅ **Criador da playlist** 
+- ✅ **Criador da playlist**
 - ✅ **Título do vídeo**
 - ✅ **Canal original**
 - ✅ **Duração**

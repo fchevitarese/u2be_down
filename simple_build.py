@@ -48,13 +48,13 @@ def main():
 
     # Comando PyInstaller básico
     cmd = ["pyinstaller", "--onefile", "--console", "--name=u2be_down"]
-    
+
     # Adicionar ícone se existir
     if platform.system() == "Windows" and Path("assets/icon.ico").exists():
         cmd.extend(["--icon=assets/icon.ico"])
     elif Path("assets/icon.png").exists():
         cmd.extend(["--icon=assets/icon.png"])
-    
+
     cmd.append("main.py")
 
     # Adicionar dados se existirem

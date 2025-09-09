@@ -89,15 +89,15 @@ case $choice in
         ;;
     5)
         echo "🎯 Criando todos os formatos..."
-        
+
         echo "📦 1/3 - Criando pacote .deb..."
         ./create_deb.sh
         echo ""
-        
+
         echo "🚀 2/3 - Criando AppImage..."
         ./create_appimage.sh
         echo ""
-        
+
         echo "📦 3/3 - Criando arquivo tar.gz..."
         create_tarball
         ;;
@@ -110,22 +110,22 @@ esac
 # Função para criar tarball
 create_tarball() {
     echo "📦 Criando arquivo tar.gz portável..."
-    
+
     TAR_DIR="u2be-down-portable"
     rm -rf "$TAR_DIR"
     mkdir -p "$TAR_DIR"
-    
+
     # Copiar arquivos
     cp "dist/u2be_down" "$TAR_DIR/"
-    
+
     if [ -d "assets" ]; then
         cp -r "assets" "$TAR_DIR/"
     fi
-    
+
     if [ -f "config.json" ]; then
         cp "config.json" "$TAR_DIR/"
     fi
-    
+
     # Criar script de execução
     cat > "$TAR_DIR/run.sh" << 'EOF'
 #!/bin/bash
@@ -138,10 +138,10 @@ DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$DIR"
 ./u2be_down "$@"
 EOF
-    
+
     chmod +x "$TAR_DIR/run.sh"
     chmod +x "$TAR_DIR/u2be_down"
-    
+
     # Criar README
     cat > "$TAR_DIR/README.txt" << EOF
 U2Be Down - YouTube Downloader
@@ -166,13 +166,13 @@ Uso:
 Versão: 1.0.2
 Site: https://github.com/fchevitarese/u2be_down
 EOF
-    
+
     # Criar tarball
     tar -czf "u2be-down-1.0.2-linux-portable.tar.gz" "$TAR_DIR"
-    
+
     echo "✅ Tarball criado: u2be-down-1.0.2-linux-portable.tar.gz"
     echo "📏 Tamanho: $(du -h "u2be-down-1.0.2-linux-portable.tar.gz" | cut -f1)"
-    
+
     # Limpar
     rm -rf "$TAR_DIR"
 }

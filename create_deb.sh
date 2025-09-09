@@ -255,7 +255,7 @@ echo "🔨 Construindo pacote .deb..."
 # Construir o pacote
 if command -v dpkg-deb >/dev/null 2>&1; then
     dpkg-deb --build "$DEB_DIR"
-    
+
     echo ""
     echo "✅ Pacote .deb criado com sucesso!"
     echo "📦 Arquivo: ${DEB_DIR}.deb"
@@ -267,7 +267,7 @@ if command -v dpkg-deb >/dev/null 2>&1; then
     echo ""
     echo "🗑️  Para remover:"
     echo "   sudo apt remove $PACKAGE_NAME"
-    
+
     # Verificar integridade do pacote
     echo "🔍 Verificando integridade do pacote..."
     if dpkg-deb --info "${DEB_DIR}.deb" >/dev/null 2>&1; then
@@ -276,7 +276,7 @@ if command -v dpkg-deb >/dev/null 2>&1; then
         echo "❌ Erro na verificação do pacote"
         exit 1
     fi
-    
+
 else
     echo "❌ dpkg-deb não encontrado. Instale com:"
     echo "   sudo apt install dpkg-dev"
