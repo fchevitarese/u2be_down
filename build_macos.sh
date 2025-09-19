@@ -40,109 +40,38 @@ if [ -f "requirements.txt" ]; then
     pip3 install -r requirements.txt
 fi
 
-# Criar executável da GUI
-echo "🔨 Compilando executável da GUI..."
-python3 -m PyInstaller \
-    --onefile \
-    --windowed \
-    --name "U2Be Down" \
-    --icon "assets/icon.ico" \
-    --add-data "assets:assets" \
-    --osx-bundle-identifier "com.u2bedown.app" \
-    gui.py
-
-# Verificar se foi criado
-if [ ! -f "dist/U2Be Down" ]; then
-    echo "❌ Falha ao criar executável!"
+# Verificar se o arquivo .spec existe
+if [ ! -f "U2Be Down.spec" ]; then
+    echo "❌ Arquivo 'U2Be Down.spec' não encontrado!"
     exit 1
 fi
 
-echo "✅ Executável criado: dist/U2Be Down"
+# Limpar builds anteriores
+echo "🧹 Limpando builds anteriores..."
+rm -rf build/ dist/
 
-# Criar aplicação .app
-echo "📱 Criando aplicação .app..."
-APP_NAME="U2Be Down.app"
-APP_DIR="dist/$APP_NAME"
-CONTENTS_DIR="$APP_DIR/Contents"
-MACOS_DIR="$CONTENTS_DIR/MacOS"
-RESOURCES_DIR="$CONTENTS_DIR/Resources"
+# Criar executável da GUI usando o arquivo .spec
+echo "🔨 Compilando executável da GUI com arquivo .spec..."
+python3 -m PyInstaller "U2Be Down.spec"
 
-# Criar estrutura do .app
-mkdir -p "$MACOS_DIR"
-mkdir -p "$RESOURCES_DIR"
-
-# Mover executável
-mv "dist/U2Be Down" "$MACOS_DIR/U2Be Down"
-
-# Criar Info.plist
-cat > "$CONTENTS_DIR/Info.plist" << EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <key>CFBundleExecutable</key>
-    <string>U2Be Down</string>
-    <key>CFBundleIdentifier</key>
-    <string>com.u2bedown.app</string>
-    <key>CFBundleName</key>
-    <string>U2Be Down</string>
-    <key>CFBundleVersion</key>
-    <string>1.0.2</string>
-    <key>CFBundleShortVersionString</key>
-    <string>1.0.2</string>
-    <key>CFBundleInfoDictionaryVersion</key>
-    <string>6.0</string>
-    <key>CFBundlePackageType</key>
-    <string>APPL</string>
-    <key>CFBundleSignature</key>
-    <string>????</string>
-    <key>LSMinimumSystemVersion</key>
-    <string>10.15</string>
-    <key>NSPrincipalClass</key>
-    <string>NSApplication</string>
-    <key>NSHighResolutionCapable</key>
-    <true/>
-    <key>CFBundleDocumentTypes</key>
-    <array>
-        <dict>
-            <key>CFBundleTypeExtensions</key>
-            <array>
-                <string>*</string>
-            </array>
-            <key>CFBundleTypeName</key>
-            <string>URL</string>
-            <key>CFBundleTypeRole</key>
-            <string>Viewer</string>
-            <key>LSHandlerRank</key>
-            <string>Alternate</string>
-        </dict>
-    </array>
-</dict>
-</plist>
-EOF
-
-# Copiar ícone se existir
-if [ -f "assets/icon.icns" ]; then
-    cp "assets/icon.icns" "$RESOURCES_DIR/icon.icns"
-    # Adicionar ícone ao Info.plist
-    sed -i '' 's|</dict>|    <key>CFBundleIconFile</key>\
-    <string>icon.icns</string>\
-</dict>|' "$CONTENTS_DIR/Info.plist"
-elif [ -f "assets/icon.png" ]; then
-    # Converter PNG para ICNS se possível
-    if command -v sips &> /dev/null; then
-        echo "🖼️  Convertendo ícone PNG para ICNS..."
-        sips -s format icns "assets/icon.png" --out "$RESOURCES_DIR/icon.icns"
-        sed -i '' 's|</dict>|    <key>CFBundleIconFile</key>\
-    <string>icon.icns</string>\
-</dict>|' "$CONTENTS_DIR/Info.plist"
-    fi
+# Verificar se foi criado
+if [ ! -d "dist/U2Be Down.app" ]; then
+    echo "❌ Falha ao criar aplicação!"
+    exit 1
 fi
 
-# Tornar executável
-chmod +x "$MACOS_DIR/U2Be Down"
+echo "✅ Aplicação criada: dist/U2Be Down.app"
 
-echo "✅ Aplicação .app criada: $APP_DIR"
+APP_NAME="U2Be Down.app"
+APP_DIR="dist/$APP_NAME"
+
+# Verificar se a aplicação foi criada corretamente
+if [ ! -d "$APP_DIR" ]; then
+    echo "❌ Aplicação .app não foi criada corretamente!"
+    exit 1
+fi
+
+echo "✅ Aplicação .app finalizada: $APP_DIR"
 
 # Criar DMG (se possível)
 if command -v hdiutil &> /dev/null; then

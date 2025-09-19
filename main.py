@@ -1,14 +1,14 @@
 import argparse
+import concurrent.futures
 import logging
 import os
-import shutil
-import concurrent.futures
 import re
+import shutil
 from threading import Lock
 
-from moviepy.editor import VideoFileClip
 from yt_dlp import YoutubeDL
-from config import load_config, add_download_to_history, update_download_status
+
+from config import add_download_to_history, load_config, update_download_status
 
 # Lock para operações thread-safe no histórico
 history_lock = Lock()
@@ -101,6 +101,9 @@ def parse_urls_and_extract_info(urls):
 def convert_video_to_mp3(video_path, progress_callback=None):
     """Converte vídeo para MP3 com callback de progresso"""
     try:
+        # Import apenas quando necessário para evitar problemas no PyInstaller
+        from moviepy.video.io.VideoFileClip import VideoFileClip
+        
         if progress_callback:
             progress_callback(
                 {
@@ -147,7 +150,7 @@ def convert_video_to_mp3(video_path, progress_callback=None):
 
 
 def download_single_video(
-    url, output_path, convert_to_mp3=False, progress_callback=None, video_info=None
+    url, output_path, convert_to_mp3=False, keep_video=False, progress_callback=None, video_info=None
 ):
     """Download de um único vídeo com progresso real das duas fases
 
@@ -155,6 +158,7 @@ def download_single_video(
         url: URL do vídeo
         output_path: Caminho base de download
         convert_to_mp3: Se deve converter para MP3
+        keep_video: Se deve manter o arquivo de vídeo original após conversão
         progress_callback: Callback para progresso
         video_info: Informações do vídeo (incluindo dados de playlist)
     """
@@ -209,12 +213,19 @@ def download_single_video(
             logging.warning(f"Erro ao criar diretório da playlist: {e}")
             # Continua com diretório original em caso de erro
 
+    # Formato com fallbacks para maior compatibilidade
+    # 1. Tenta best (melhor qualidade com áudio+vídeo)
+    # 2. Se falhar, tenta bestvideo+bestaudio/best (combina melhor vídeo e áudio)
+    # 3. Se falhar, tenta worst (pior qualidade, mas sempre disponível)
+    format_selector = "best[height<=1080]/bestvideo[height<=1080]+bestaudio/best/worst"
+    
     ydl_opts = {
-        "format": "best",
+        "format": format_selector,
         "outtmpl": os.path.join(final_output_path, "%(title)s.%(ext)s"),
         "progress_hooks": [enhanced_progress_hook] if progress_callback else [],
         "ignoreerrors": False,  # Mudamos para False para capturar erros
         "no_warnings": False,  # Ativar warnings para debug
+        "merge_output_format": "mp4",  # Força saída em MP4 quando combina formatos
     }
 
     try:
@@ -256,10 +267,11 @@ def download_single_video(
                 mp3_path = convert_video_to_mp3(video_path, progress_callback)
                 if mp3_path:
                     final_path = mp3_path
-                    try:
-                        os.remove(video_path)  # Remove vídeo original
-                    except FileNotFoundError:
-                        pass
+                    if not keep_video:  # Só remove se não quiser manter o vídeo
+                        try:
+                            os.remove(video_path)  # Remove vídeo original
+                        except FileNotFoundError:
+                            pass
 
                     # Conversão concluída
                     if progress_callback:
@@ -276,13 +288,58 @@ def download_single_video(
             return True, final_path
 
     except Exception as e:
-        logging.error(f"Erro no download de {url}: {e}")
-        return False, str(e)
+        error_msg = str(e)
+        logging.error(f"Erro no download de {url}: {error_msg}")
+        
+        # Se o erro é sobre formato não disponível, tenta com formato mais básico
+        if "Requested format is not available" in error_msg or "format" in error_msg.lower():
+            logging.info(f"Tentando download com formato de fallback para: {url}")
+            try:
+                # Fallback com formato mais simples
+                fallback_ydl_opts = {
+                    "format": "worst",  # Formato mais básico, sempre disponível
+                    "outtmpl": os.path.join(final_output_path, "%(title)s.%(ext)s"),
+                    "progress_hooks": [enhanced_progress_hook] if progress_callback else [],
+                    "ignoreerrors": False,
+                    "no_warnings": False,
+                }
+                
+                with YoutubeDL(fallback_ydl_opts) as ydl_fallback:
+                    logging.info(f"Tentativa de fallback para: {url}")
+                    info_dict = ydl_fallback.extract_info(url, download=True)
+                    
+                    if not info_dict:
+                        return False, "Fallback: yt-dlp não conseguiu extrair informações do vídeo"
+                    
+                    video_path = ydl_fallback.prepare_filename(info_dict)
+                    
+                    if not video_path or not os.path.exists(video_path):
+                        return False, f"Fallback: Arquivo não foi baixado: {video_path}"
+                    
+                    final_path = video_path
+                    if convert_to_mp3:
+                        mp3_path = convert_video_to_mp3(video_path, progress_callback)
+                        if mp3_path:
+                            final_path = mp3_path
+                            if not keep_video:  # Só remove se não quiser manter o vídeo
+                                try:
+                                    os.remove(video_path)
+                                except FileNotFoundError:
+                                    pass
+                    
+                    logging.info(f"Download de fallback bem-sucedido: {final_path}")
+                    return True, final_path
+                    
+            except Exception as fallback_error:
+                logging.error(f"Erro no download de fallback de {url}: {fallback_error}")
+                return False, f"Ambos os métodos falharam. Original: {error_msg}, Fallback: {str(fallback_error)}"
+        
+        return False, error_msg
 
 
 def download_video_safe(args):
     """Wrapper thread-safe para download_single_video"""
-    video_info, download_path, to_mp3, progress_callback = args
+    video_info, download_path, to_mp3, keep_video, progress_callback = args
     url = video_info["url"]
     title = video_info["title"]
 
@@ -298,7 +355,7 @@ def download_video_safe(args):
     try:
         # Passa video_info para download_single_video para informações de playlist
         success, result = download_single_video(
-            url, download_path, to_mp3, wrapped_progress_callback, video_info
+            url, download_path, to_mp3, keep_video, wrapped_progress_callback, video_info
         )
 
         if success:
@@ -320,12 +377,12 @@ def download_video_safe(args):
 
 
 def download_videos_parallel(
-    videos_info, download_path, to_mp3=True, max_workers=2, progress_callback=None
+    videos_info, download_path, to_mp3=True, keep_video=False, max_workers=2, progress_callback=None
 ):
     """Download múltiplos vídeos em paralelo"""
     # Prepara os argumentos para cada download
     download_args = [
-        (video_info, download_path, to_mp3, progress_callback)
+        (video_info, download_path, to_mp3, keep_video, progress_callback)
         for video_info in videos_info
     ]
 
@@ -395,7 +452,7 @@ def download_video(
 ):
     """Função de download básica (compatibilidade)"""
     success, result = download_single_video(
-        url, output_path, convert_to_mp3, progress_callback
+        url, output_path, convert_to_mp3, keep_video, progress_callback
     )
     return success
 

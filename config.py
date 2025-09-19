@@ -1,6 +1,6 @@
 import json
-import os
 import logging
+import os
 import threading
 from datetime import datetime
 
@@ -58,30 +58,10 @@ def save_config(config):
 def load_downloads_history():
     """Carrega o histórico de downloads do arquivo JSON"""
     with _file_lock:  # Proteger acesso ao arquivo
-        debug_logger.info("🔍 LOAD_HISTORY: Iniciando carregamento com lock")
-        logging.info("🔍 LOAD_HISTORY: Iniciando carregamento com lock")
-
         if os.path.exists(DOWNLOADS_HISTORY_FILE):
             try:
                 with open(DOWNLOADS_HISTORY_FILE, "r", encoding="utf-8") as file:
                     downloads = json.load(file)
-
-                    debug_logger.info(
-                        f"🔍 LOAD_HISTORY: Carregados {len(downloads)} downloads do arquivo"
-                    )
-                    logging.info(
-                        f"🔍 LOAD_HISTORY: Carregados {len(downloads)} downloads do arquivo"
-                    )
-
-                    # Debug: mostrar status atual
-                    status_count = {}
-                    for download in downloads:
-                        status = download.get("status", "unknown")
-                        status_count[status] = status_count.get(status, 0) + 1
-
-                    debug_logger.info(f"🔍 LOAD_HISTORY: Status atual: {status_count}")
-                    logging.info(f"🔍 LOAD_HISTORY: Status atual: {status_count}")
-
                     return downloads
             except Exception as e:
                 debug_logger.error(f"❌ LOAD_HISTORY: Erro ao carregar histórico: {e}")
@@ -95,40 +75,11 @@ def load_downloads_history():
 def save_downloads_history(downloads):
     """Salva o histórico de downloads no arquivo JSON"""
     with _file_lock:  # Proteger acesso ao arquivo
-        debug_logger.info(
-            f"💾 SAVE_HISTORY: Tentando salvar {len(downloads)} downloads"
-        )
-        logging.info(f"💾 SAVE_HISTORY: Tentando salvar {len(downloads)} downloads")
-
-        # Debug: mostrar breakdown de status
-        status_count = {}
-        for download in downloads:
-            status = download.get("status", "unknown")
-            status_count[status] = status_count.get(status, 0) + 1
-
-        debug_logger.info(f"💾 SAVE_HISTORY: Status breakdown: {status_count}")
-        logging.info(f"💾 SAVE_HISTORY: Status breakdown: {status_count}")
-
-        # Debug: mostrar primeiras entradas
-        if downloads:
-            debug_logger.info("💾 SAVE_HISTORY: Primeiras 3 entradas:")
-            logging.info("💾 SAVE_HISTORY: Primeiras 3 entradas:")
-            for i, download in enumerate(downloads[:3]):
-                debug_logger.info(
-                    f"   {i+1}. {download.get('title', 'N/A')} - {download.get('status', 'N/A')}"
-                )
-                logging.info(
-                    f"   {i+1}. {download.get('title', 'N/A')} - {download.get('status', 'N/A')}"
-                )
-
         try:
             with open(DOWNLOADS_HISTORY_FILE, "w", encoding="utf-8") as file:
                 json.dump(downloads, file, indent=2, ensure_ascii=False)
-            debug_logger.info("💾 SAVE_HISTORY: ✅ Arquivo salvo com sucesso")
-            logging.info("💾 SAVE_HISTORY: ✅ Arquivo salvo com sucesso")
         except Exception as e:
-            debug_logger.error(f"💾 SAVE_HISTORY: ❌ Erro ao salvar: {e}")
-            logging.error(f"💾 SAVE_HISTORY: ❌ Erro ao salvar: {e}")
+            logging.error(f"Erro ao salvar histórico: {e}")
 
 
 def add_download_to_history(title, url, file_path="", status="pending"):

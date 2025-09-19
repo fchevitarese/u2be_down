@@ -4,41 +4,42 @@ import subprocess
 import sys
 from datetime import datetime
 
-from PyQt5.QtCore import Qt, QThread, pyqtSignal, QTimer
-from PyQt5.QtGui import QIcon, QColor
+from PyQt5.QtCore import Qt, QThread, QTimer, pyqtSignal
+from PyQt5.QtGui import QColor, QIcon
 from PyQt5.QtWidgets import (
     QApplication,
     QCheckBox,
     QFileDialog,
+    QGroupBox,
     QHBoxLayout,
     QHeaderView,
     QLabel,
     QMainWindow,
     QMenu,
     QMessageBox,
+    QProgressBar,
     QPushButton,
+    QSplitter,
     QTableWidget,
     QTableWidgetItem,
+    QTabWidget,
     QTextEdit,
     QVBoxLayout,
     QWidget,
-    QProgressBar,
-    QSplitter,
-    QGroupBox,
-    QTabWidget,
 )
+
 from config import (
-    load_config,
-    save_config,
-    load_downloads_history,
     add_download_to_history,
+    load_config,
+    load_downloads_history,
+    save_config,
     update_download_status,
 )
 from config_window import ConfigWindow
 from main import (
+    download_videos_parallel,
     parse_urls_and_extract_info,
     parse_urls_parallel,
-    download_videos_parallel,
 )
 from music_player import MusicPlayer
 
@@ -71,11 +72,12 @@ class ParallelDownloadThread(QThread):
     progress_update = pyqtSignal(str, dict)  # url, progress_data
     all_finished = pyqtSignal()
 
-    def __init__(self, videos_info, download_path, to_mp3=True):
+    def __init__(self, videos_info, download_path, to_mp3=True, keep_video=False):
         super().__init__()
         self.videos_info = videos_info
         self.download_path = download_path
         self.to_mp3 = to_mp3
+        self.keep_video = keep_video
 
     def progress_callback(self, url, data):
         """Callback para progresso de download"""
@@ -90,6 +92,7 @@ class ParallelDownloadThread(QThread):
                 self.videos_info,
                 self.download_path,
                 self.to_mp3,
+                self.keep_video,
                 max_workers=2,
                 progress_callback=self.progress_callback,
             )
@@ -111,10 +114,10 @@ class YouTubeDownloader(QMainWindow):
         self.initUI()
         self.load_downloads_history()
 
-        # Timer para atualizar a lista periodicamente
+        # Timer para atualizar a lista periodicamente (reduzido para evitar spam de logs)
         self.update_timer = QTimer()
         self.update_timer.timeout.connect(self.load_downloads_history)
-        self.update_timer.start(2000)  # Atualiza a cada 2 segundos
+        self.update_timer.start(10000)  # Atualiza a cada 10 segundos
 
     def setup_logging(self):
         """Configura o logging baseado nas configurações"""
@@ -492,12 +495,13 @@ class YouTubeDownloader(QMainWindow):
             # Inicia download paralelo automaticamente
             output_path = self.path_label.text()
             convert_to_mp3 = self.mp3_checkbox.isChecked()
+            keep_video = self.keep_video_checkbox.isChecked()
 
             self.download_button.setText("Baixando...")
 
             # Inicia thread de download paralelo
             self.parallel_download_thread = ParallelDownloadThread(
-                videos, output_path, convert_to_mp3
+                videos, output_path, convert_to_mp3, keep_video
             )
             self.parallel_download_thread.progress_update.connect(
                 self.on_download_progress
